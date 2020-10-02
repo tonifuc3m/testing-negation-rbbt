@@ -31,7 +31,14 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
     feature_Ids = []
     char_Ids = []
     label_Ids = []
-
+    
+    # TONI: added these to keep track of document name and position
+    instence_original_doc = []
+    instence_pos_in_doc = []
+    documents = []
+    positions = []
+    
+    
     ## if sentence classification data format, splited by \t
     if sentence_classification:
         for line in in_lines:
@@ -97,6 +104,13 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
         for line in in_lines:
             if len(line) > 2:
                 pairs = line.strip().split()
+                
+                # TONI: added these to keep track of document name and position
+                doc = pairs[1]
+                pos = pairs[2:4]
+                documents.append(doc)
+                positions.append(pos)
+                
                 word = pairs[0]
                 if sys.version_info[0] < 3:
                     word = word.decode('utf-8')
@@ -137,6 +151,14 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
                 if (len(words) > 0) and ((max_sent_length < 0) or (len(words) < max_sent_length)) :
                     instence_texts.append([words, features, chars, labels])
                     instence_Ids.append([word_Ids, feature_Ids, char_Ids,label_Ids])
+                    
+                    # TONI: added these to keep track of document name and position
+                    instence_original_doc.append(documents)
+                    instence_pos_in_doc.append(positions)
+                # TONI: added these to keep track of document name and position
+                documents = []
+                positions = []
+                
                 words = []
                 features = []
                 chars = []
@@ -148,6 +170,13 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
         if (len(words) > 0) and ((max_sent_length < 0) or (len(words) < max_sent_length)) :
             instence_texts.append([words, features, chars, labels])
             instence_Ids.append([word_Ids, feature_Ids, char_Ids,label_Ids])
+            
+            # TONI: added these to keep track of document name and position
+            instence_original_doc.append(documents)
+            instence_pos_in_doc.append(positions)
+            documents = []
+            positions = []
+            
             words = []
             features = []
             chars = []
@@ -156,7 +185,8 @@ def read_instance(input_file, word_alphabet, char_alphabet, feature_alphabets, l
             feature_Ids = []
             char_Ids = []
             label_Ids = []
-    return instence_texts, instence_Ids
+    return instence_texts, instence_Ids, instence_original_doc, instence_pos_in_doc # TONI: added last 2 outputs to keep track of document name and position
+
 
 
 def build_pretrain_embedding(embedding_path, word_alphabet, embedd_dim=100, norm=True):
