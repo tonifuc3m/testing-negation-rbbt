@@ -558,12 +558,12 @@ if __name__ == '__main__':
         data.read_config(args.config)
         print(data.raw_dir)
         # exit(0)
-        data.show_data_summary()
+        data.show_data_summary()       
         data.generate_instance('raw')
         print("nbest: %s"%(data.nbest))
         decode_results, pred_scores = load_model_decode(data, 'raw')
         if data.nbest and not data.sentence_classification:
-            data.write_nbest_decoded_results(decode_results, pred_scores, 'raw')
+            data.write_nbest_decoded_results(decode_results, pred_scores, 'raw', data.docs, data.positions) # TONI: added last 2 arguments to keep track of document name
         else:
             data.write_decoded_results(decode_results, 'raw')
     else:

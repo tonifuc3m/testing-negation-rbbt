@@ -303,7 +303,7 @@ class Data:
         elif name == "test":
             self.test_texts, self.test_Ids = read_instance(self.test_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token)
         elif name == "raw":
-            self.raw_texts, self.raw_Ids = read_instance(self.raw_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token)
+            self.raw_texts, self.raw_Ids, self.docs, self.positions = read_instance(self.raw_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token) # TONI: added last 2 arguments to keep track of document name
         else:
             print("Error: you can only generate train/dev/test instance! Illegal input:%s"%(name))
 
@@ -350,7 +350,7 @@ class Data:
 
 
 
-    def write_nbest_decoded_results(self, predict_results, pred_scores, name):
+    def write_nbest_decoded_results(self, predict_results, pred_scores, name, docs, positions): # TONI: added last 2 arguments to keep track of document name
         ## predict_results : [whole_sent_num, nbest, each_sent_length]
         ## pred_scores: [whole_sent_num, nbest]
         fout = open(self.decode_dir,'w')
@@ -371,8 +371,10 @@ class Data:
         for idx in range(sent_num):
             sent_length = len(predict_results[idx][0])
             nbest = len(predict_results[idx])
-            score_string = "# "
-            for idz in range(nbest):
+            #score_string = "# " # TONI: modified this to keep track of document name
+            score_string = "# doc pos0 pos1 " # TONI: modified this to keep track of document name
+            #for idz in range(nbest):
+            for idz in range(1): # TONI: modify this to print just the first one! The best!
                 score_string += format(pred_scores[idx][idz], '.4f')+" "
             fout.write(score_string.strip() + "\n")
 
@@ -381,7 +383,12 @@ class Data:
                     label_string = content_list[idx][0][idy].encode('utf-8') + " "
                 except:
                     label_string = content_list[idx][0][idy] + " "
-                for idz in range(nbest):
+                    
+                label_string += docs[idx][idy] + " " # TONI: added this to keep track of document name
+                label_string += ' '.join(positions[idx][idy]) + " " # TONI: added this to keep track of position
+                
+                #for idz in range(nbest): # TONI: modify this to print just the first one! The best!
+                for idz in range(1): # TONI: modify this to print just the first one! The best!
                     label_string += predict_results[idx][idz][idy]+" "
                 label_string = label_string.strip() + "\n"
                 fout.write(label_string)
