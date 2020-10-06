@@ -371,13 +371,15 @@ class Data:
         for idx in range(sent_num):
             sent_length = len(predict_results[idx][0])
             nbest = len(predict_results[idx])
+            '''
+            TONI: eliminate the header that is print before every sentence
             #score_string = "# " # TONI: modified this to keep track of document name
             score_string = "# doc pos0 pos1 " # TONI: modified this to keep track of document name
             #for idz in range(nbest):
             for idz in range(1): # TONI: modify this to print just the first one! The best!
                 score_string += format(pred_scores[idx][idz], '.4f')+" "
             fout.write(score_string.strip() + "\n")
-
+            '''
             for idy in range(sent_length):
                 try:  # Will fail with python3
                     label_string = content_list[idx][0][idy].encode('utf-8') + " "
