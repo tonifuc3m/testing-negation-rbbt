@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import sys
 from .alphabet import Alphabet
 from .functions import *
+from .neuroner.get_valid_dataset_filepaths import _get_valid_dataset_filepaths
 
 try:
     import cPickle as pickle
@@ -79,6 +80,13 @@ class Data:
         self.norm_feature_embs = []
         self.word_emb_dim = 50
         self.char_emb_dim = 30
+        
+        
+        # TONI:
+        self.raw_conll = ''
+        self.tokenizer = 'spacy'
+        self.spacylanguage = 'es_core_news_sm'
+        self.tagging_format = 'bioes'
 
         ###Networks
         self.word_feature_extractor = "LSTM" ## "LSTM"/"CNN"/"GRU"/
@@ -303,7 +311,9 @@ class Data:
         elif name == "test":
             self.test_texts, self.test_Ids = read_instance(self.test_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token)
         elif name == "raw":
-            self.raw_texts, self.raw_Ids, self.docs, self.positions = read_instance(self.raw_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token) # TONI: added last 2 arguments to keep track of document name
+            self.raw_conll,_ = _get_valid_dataset_filepaths(self.raw_dir, self.tokenizer, self.spacylanguage, self.tagging_format, ['deploy']) # TONI: Brat to CONLL
+            print(self.raw_conll)
+            self.raw_texts, self.raw_Ids, self.docs, self.positions = read_instance(self.raw_conll['deploy'], self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token) # TONI: added last 2 arguments to keep track of document name
         else:
             print("Error: you can only generate train/dev/test instance! Illegal input:%s"%(name))
 
@@ -543,6 +553,19 @@ class Data:
         the_item = 'l2'
         if the_item in config:
             self.HP_l2 = float(config[the_item])
+            
+        ## TONI: preprocessing parameters
+        the_item = 'tokenizer'
+        if the_item in config:
+            self.tokenizer = str(config[the_item])
+        the_item = 'spacylanguage'
+        if the_item in config:
+            self.spacylanguage = str(config[the_item])
+        the_item = 'tagging_format'
+        if the_item in config:
+            self.tagging_format = str(config[the_item])
+            
+            
         ## no seg for sentence classification
         if self.sentence_classification:
             self.seg = False
