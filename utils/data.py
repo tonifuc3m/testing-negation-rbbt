@@ -147,6 +147,7 @@ class Data:
         print("     Model  file directory: %s"%(self.model_dir))
         print("     Loadmodel   directory: %s"%(self.load_model_dir))
         print("     Decode file directory: %s"%(self.decode_dir))
+        print("     Decode file directory (Brat format): %s"%(self.brat_out_dir))
         print("     Train instance number: %s"%(len(self.train_texts)))
         print("     Dev   instance number: %s"%(len(self.dev_texts)))
         print("     Test  instance number: %s"%(len(self.test_texts)))
@@ -185,6 +186,12 @@ class Data:
         print("     Hyper      lstm_layer: %s"%(self.HP_lstm_layer))
         print("     Hyper          bilstm: %s"%(self.HP_bilstm))
         print("     Hyper             GPU: %s"%(self.HP_gpu))
+        
+        print(" "+"++"*20)
+        print(" Neuroner preprocessing parameters:")
+        print("     Tokenizer: %s"%(self.tokenizer))
+        print("     Spacy language model: %s"%(self.spacylanguage))
+        print("     Tagging format: %s"%(self.tagging_format))        
         print("DATA SUMMARY END.")
         print("++"*50)
         sys.stdout.flush()
@@ -312,7 +319,6 @@ class Data:
             self.test_texts, self.test_Ids = read_instance(self.test_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token)
         elif name == "raw":
             self.raw_conll,_ = _get_valid_dataset_filepaths(self.raw_dir, self.tokenizer, self.spacylanguage, self.tagging_format, ['deploy']) # TONI: Brat to CONLL
-            print(self.raw_conll)
             self.raw_texts, self.raw_Ids, self.docs, self.positions = read_instance(self.raw_conll['deploy'], self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH, self.sentence_classification, self.split_token) # TONI: added last 2 arguments to keep track of document name
         else:
             print("Error: you can only generate train/dev/test instance! Illegal input:%s"%(name))
@@ -427,6 +433,9 @@ class Data:
         the_item = 'decode_dir'
         if the_item in config:
             self.decode_dir = config[the_item]
+        the_item = 'brat_out_dir'
+        if the_item in config:
+            self.brat_out_dir = config[the_item]
         the_item = 'dset_dir'
         if the_item in config:
             self.dset_dir = config[the_item]
@@ -554,7 +563,7 @@ class Data:
         if the_item in config:
             self.HP_l2 = float(config[the_item])
             
-        ## TONI: preprocessing parameters
+        ## Neuroner preprocessing parameters
         the_item = 'tokenizer'
         if the_item in config:
             self.tokenizer = str(config[the_item])

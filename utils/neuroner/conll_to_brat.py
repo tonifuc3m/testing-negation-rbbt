@@ -5,6 +5,7 @@ import glob
 import shutil
 from . import utils_nlp
 
+
 def generate_reference_text_file_for_conll(conll_input_filepath, conll_output_filepath, text_folder):
     '''
     generates reference text files and adds the corresponding filename and token offsets to conll file.

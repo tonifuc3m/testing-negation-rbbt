@@ -5,6 +5,7 @@
 # @Last Modified time: 2019-02-13 12:41:44
 
 from __future__ import print_function
+import os
 import time
 import sys
 import argparse
@@ -18,6 +19,8 @@ from utils.metric import get_ner_fmeasure
 from model.seqlabel import SeqLabel
 from model.sentclassifier import SentClassifier
 from utils.data import Data
+from utils.neuroner import conll_to_brat
+
 
 try:
     import cPickle as pickle
@@ -564,6 +567,9 @@ if __name__ == '__main__':
         decode_results, pred_scores = load_model_decode(data, 'raw')
         if data.nbest and not data.sentence_classification:
             data.write_nbest_decoded_results(decode_results, pred_scores, 'raw', data.docs, data.positions) # TONI: added last 2 arguments to keep track of document name
+            conll_to_brat.output_brat({'deploy': data.decode_dir}, 
+                                      {'deploy': os.path.join(data.raw_dir, 'deploy')}, 
+                                      data.brat_out_dir, overwrite=True)
         else:
             data.write_decoded_results(decode_results, 'raw')
     else:
