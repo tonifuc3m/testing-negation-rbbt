@@ -4,7 +4,7 @@ Basically, I have added support to input and output Brat files in decode mode an
 # Usage
 
 ```
-python main.py --config demo.decode.config
+python -W ignore main.py --config demo.decode.config
 ```
 
 
